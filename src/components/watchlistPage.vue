@@ -61,21 +61,18 @@
                     v-if="!coin.editing"
                     class="btn btn-sm btn-warning me-2"
                     @click="editCoin(coin)"
-                  >
-                    Edit
+                  > Edit
                   </button>
                   <button
                     v-else
                     class="btn btn-sm btn-success me-2"
                     @click="saveCoin(coin)"
-                  >
-                    Save
+                  > Save
                   </button>
                   <button
                     class="btn btn-sm btn-danger"
                     @click="deleteCoin(coin.id)"
-                  >
-                    Delete
+                  > Delete
                   </button>
                 </td>
               </tr>
