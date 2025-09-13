@@ -4,14 +4,13 @@
       <div class="card shadow-lg border-0 rounded-3">
         <div class="card-body">
           <h4 class="mb-4 text-center">My Watchlist</h4>
-
           <form @submit.prevent="addCoin" class="row g-3 mb-3">
             <div class="col-md-5">
               <input
                 v-model="newCoin.name"
                 type="text"
                 class="form-control"
-                placeholder="Enter Coin Name"
+                placeholder="Enter Coin Name (e.g. bitcoin)"
                 required
               />
             </div>
@@ -25,9 +24,15 @@
               />
             </div>
             <div class="col-md-2">
-              <button type="submit" class="btn btn-primary w-100">Add</button>
+              <button type="submit" class="btn btn-primary w-100" :disabled="loading">
+                {{ loading ? "Checking..." : "Add" }}
+              </button>
             </div>
           </form>
+
+          <div v-if="error" class="alert alert-danger text-center py-2">
+            {{ error }}
+          </div>
 
           <table v-if="watchlist.length > 0" class="table table-hover align-middle">
             <thead class="table-dark">
@@ -90,6 +95,8 @@ export default {
     return {
       newCoin: { name: "", price: "" },
       watchlist: [],
+      error: "",
+      loading: false,
     };
   },
   mounted() {
@@ -97,16 +104,44 @@ export default {
     this.watchlist = saved ? JSON.parse(saved) : [];
   },
   methods: {
-    addCoin() {
-      const coin = {
-        id: Date.now(),
-        name: this.newCoin.name,
-        price: this.newCoin.price,
-        editing: false,
-      };
-      this.watchlist.push(coin);
-      this.saveToStorage();
-      this.newCoin = { name: "", price: "" };
+    async addCoin() {
+      this.error = "";
+      this.loading = true;
+
+      try {
+        // Fetch list of valid coins from CoinGecko
+        const res = await fetch("https://api.coingecko.com/api/v3/coins/list");
+        const coins = await res.json();
+
+        // Check if entered coin exists
+        const isValid = coins.some(
+          (coin) =>
+            coin.id.toLowerCase() === this.newCoin.name.toLowerCase() ||
+            coin.symbol.toLowerCase() === this.newCoin.name.toLowerCase() ||
+            coin.name.toLowerCase() === this.newCoin.name.toLowerCase()
+        );
+
+        if (!isValid) {
+          this.error = "Invalid cryptocurrency name! Please enter a valid one.";
+          this.loading = false;
+          return;
+        }
+
+        // If valid, add to watchlist
+        const coin = {
+          id: Date.now(),
+          name: this.newCoin.name,
+          price: this.newCoin.price,
+          editing: false,
+        };
+        this.watchlist.push(coin);
+        this.saveToStorage();
+        this.newCoin = { name: "", price: "" };
+      } catch (e) {
+        this.error = "Failed to verify coin. Please try again.";
+      } finally {
+        this.loading = false;
+      }
     },
     editCoin(coin) {
       coin.editing = true;
