@@ -109,11 +109,10 @@ export default {
       this.loading = true;
 
       try {
-        // Fetch list of valid coins from CoinGecko
+      
         const res = await fetch("https://api.coingecko.com/api/v3/coins/list");
         const coins = await res.json();
 
-        // Check if entered coin exists
         const isValid = coins.some(
           (coin) =>
             coin.id.toLowerCase() === this.newCoin.name.toLowerCase() ||
@@ -127,7 +126,6 @@ export default {
           return;
         }
 
-        // If valid, add to watchlist
         const coin = {
           id: Date.now(),
           name: this.newCoin.name,
