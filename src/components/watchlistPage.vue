@@ -10,7 +10,7 @@
                 v-model="newCoin.name"
                 type="text"
                 class="form-control"
-                placeholder="Enter Coin Name "
+                placeholder="Enter Coin Name (e.g. bitcoin)"
                 required
               />
             </div>
@@ -61,19 +61,16 @@
                     v-if="!coin.editing"
                     class="btn btn-sm btn-warning me-2"
                     @click="editCoin(coin)"
-                  > Edit
-                  </button>
+                  > Edit </button>
                   <button
                     v-else
                     class="btn btn-sm btn-success me-2"
                     @click="saveCoin(coin)"
-                  > Save
-                  </button>
+                  > Save </button>
                   <button
                     class="btn btn-sm btn-danger"
                     @click="deleteCoin(coin.id)"
-                  > Delete
-                  </button>
+                  > Delete </button>
                 </td>
               </tr>
             </tbody>
@@ -108,7 +105,7 @@ const addCoin = async () => {
   error.value = ""
   loading.value = true
   try {
-    const res = await axios.get("http://localhost:3000/api/coins")
+    const res = await axios.get("https://api.coingecko.com/api/v3/coins/list")
     const coins = res.data
     const isValid = coins.some(
       (coin) =>
