@@ -38,22 +38,16 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted } from "vue";
 import axios from "axios";
 
-export default {
-  data() {
-    return {
-      coins: [],
-      loading: true,
-    };
-  },
-  async mounted() {
-    const res = await axios.get("https://api.coingecko.com/api/v3/coins/markets", {
-      params: { vs_currency: "usd", per_page: 10 },
-    });
-    this.coins = res.data;
-    this.loading = false;
-  },
-};
+const coins = ref([]);
+const loading = ref(true);
+
+onMounted(async () => {
+  const res = await axios.get("http://localhost:3000/api/coins");
+  coins.value = res.data;
+  loading.value = false;
+});
 </script>
